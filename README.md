@@ -15,3 +15,6 @@
     5. [WORKER] wait JSON-RPC response from BTC/LTC node and pass event to [MASTER]
     5. [MASTER] handle MSG from worker
     6. [MASTER] exec RPC callback done(err,data)
+
+## architecture ##
+![](pg_jrpc_proxy.jpg)
