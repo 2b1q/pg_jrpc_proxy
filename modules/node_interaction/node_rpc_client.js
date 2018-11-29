@@ -4,6 +4,7 @@
 const cfg = require("../../config/config"),
     { nodes, api_version: API_VERSION, project, color: c } = cfg,
     moment = require("moment"),
+    nodeTimer = node => `${c.yellow}[timer]${c.white} ${node} node request time`,
     { Client } = require("bitcoin"),
     { api_requests: log_api, error: log_err } = require("../../utils/logger")(module);
 
@@ -35,6 +36,8 @@ const nodeRequester = (node_type, method, params) =>
         // define node type
         let con = typeof nodes[node_type] === "object" ? nodes[node_type] : undefined;
         console.log(`${node_type} connection: `, con);
+        // register timer
+        console.time(nodeTimer(node_type));
         // construct connection
         if (con) {
             // construct node client connection Object
@@ -46,6 +49,7 @@ const nodeRequester = (node_type, method, params) =>
                   return resolve(empty);
                 }
                 console.log(`${c.green}[${c.magenta}${node_type}${c.green}] node data: ${c.white}`, data);
+                console.timeEnd(nodeTimer(node_type));
                 resolve({ result: data, error: null, id: null });
             });
         } else resolve(empty); // no config for this node_type
