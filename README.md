@@ -1,27 +1,15 @@
-# README #
+# PaymentGateway JSON-RPC proxy [PG_jrpc_proxy]
 
-This README would normally document whatever steps are necessary to get your application up and running.
+**PG_jrpc_proxy** is stateless async microservice with Redis RPC interaction  
 
-### What is this repository for? ###
-
-- make JSON-RPC requests to node_type_cfg dynamicly
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+### Components and features ###
+- node.js vertical cluster 
+  - [MASTER] fork [WORKER] processes by count of CPU cores
+  - [WORKER] BTC/LTC node request client wrapper (make JSON-RPC requests to node_type_cfg dynamically)
+- Master process behavior
+   1. [MASTER] init RPC channel connection
+   2. [MASTER] handel RPC channel events
+   3. [MASTER] pass events to random [WORKER] process
+   4. [WORKER] BTC/LTC node request client wrapper (make JSON-RPC requests to node_type_cfg dynamically)
+   5. [MASTER] handle MSG from worker
+   6. [MASTER] exec RPC callback done(err,data)
