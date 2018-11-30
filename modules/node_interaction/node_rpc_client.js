@@ -4,7 +4,7 @@
 const cfg = require("../../config/config"),
     { nodes, api_version: API_VERSION, project, color: c } = cfg,
     moment = require("moment"),
-    nodeTimer = node => `${c.yellow}[timer]${c.white} ${node} node request time`,
+    nodeTimer = node => `${c.yellow}[timer]${c.magenta} ${node} node ${c.white}request time`,
     { Client } = require("bitcoin"),
     { api_requests: log_api, error: log_err } = require("../../utils/logger")(module);
 

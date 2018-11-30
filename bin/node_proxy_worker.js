@@ -11,6 +11,7 @@ worker.on('message', (msg) => {
   nodeRequest(node_type, method, params)
     .then(node_response => worker.send({
       msg: { ...node_response },
-      worker: wid
+      worker: wid,
+      node_type: node_type
     })); // send node_response to master process
   });

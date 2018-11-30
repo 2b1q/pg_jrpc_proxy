@@ -41,7 +41,7 @@ rpc.on(node_rpc_channel, ({ payload }, channel, done) =>{
   // send MSG to Random Worker
   sendMsgToRandWorker(payload);
   // MSG handler from WORKER
-  const messageHandler = ({ msg, worker }) => {
+  const messageHandler = ({ msg, worker, node_type }) => {
     // check error from worker
     if(msg.error) return done(error);
     // Trigger done handler to fire back rpc result
@@ -50,7 +50,8 @@ rpc.on(node_rpc_channel, ({ payload }, channel, done) =>{
     done(null, {
       msg: msg,
       worker: worker,
-      channel: node_rpc_channel
+      channel: node_rpc_channel,
+      node_type: node_type
     });
   };
   // handle message from worker
