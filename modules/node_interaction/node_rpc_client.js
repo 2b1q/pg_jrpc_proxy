@@ -1,6 +1,6 @@
 /*
-* Node RPC proxy client
-* */
+ * Node RPC proxy client
+ * */
 const cfg = require("../../config/config"),
     { nodes, api_version: API_VERSION, project, color: c } = cfg,
     moment = require("moment"),
@@ -29,12 +29,16 @@ let logit = (msg = "") =>
  * common node request wrapper
  * JSON-RPC node proxy client
  * */
-const nodeRequester = (node_type, method, params) =>
+const nodeRequester = (node_type, method, params, config) =>
     new Promise(resolve => {
         let cmd = Object([{ method: method, params: params }]);
-        console.log('exec cmd: ', cmd);
-        // define node type
-        let con = typeof nodes[node_type] === "object" ? nodes[node_type] : undefined;
+        console.log("exec cmd: ", cmd);
+        let con = Object.create(null); // connection Object container
+        con = config
+            ? config // if we have config => construct connection Object from incoming RPC payload
+            : typeof nodes[node_type] === "object"
+            ? nodes[node_type] // define node type without config
+            : undefined;
         console.log(`${node_type} connection: `, con);
         // register timer
         console.time(nodeTimer(node_type));
@@ -44,9 +48,9 @@ const nodeRequester = (node_type, method, params) =>
             let client = new Client(con);
             client.cmd(cmd, (err, data) => {
                 if (err) {
-                  console.error(`Error on ${node_type} client request:\n`,err);
-                  log_err(logit(err));
-                  return resolve(empty);
+                    console.error(`Error on ${node_type} client request:\n`, err);
+                    log_err(logit(err));
+                    return resolve(empty);
                 }
                 console.log(`${c.green}[${c.magenta}${node_type}${c.green}] node data: ${c.white}`, data);
                 console.timeEnd(nodeTimer(node_type));
