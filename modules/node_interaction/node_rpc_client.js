@@ -4,6 +4,7 @@
 const cfg = require("../../config/config"),
     { nodes, api_version: API_VERSION, project, color: c } = cfg,
     moment = require("moment"),
+    wid = require("cluster").worker.id,
     nodeTimer = node => `${c.yellow}[timer]${c.magenta} ${node} node ${c.white}request time`,
     { Client } = require("bitcoin"),
     { api_requests: log_api, error: log_err } = require("../../utils/logger")(module);
@@ -39,7 +40,7 @@ const nodeRequester = (node_type, method, params, config) =>
             : typeof nodes[node_type] === "object"
             ? nodes[node_type] // define node type without config
             : undefined;
-        console.log(`${node_type} connection: `, con);
+        console.log(`${c.green}WORKER[${wid}] send JSON-RPC request to ${c.yellow}${node_type}${c.green} node connection:\n${c.white}`, con);
         // register timer
         console.time(nodeTimer(node_type));
         // construct connection
