@@ -28,6 +28,22 @@ let workers = require("os").cpus().length;
 for (let i = 0; i < workers; ++i) cluster.fork();
 // Send payload to Random worker
 const sendMsgToRandWorker = payload => cluster.workers[Math.floor(Math.random() * (workers - 1)) + 1].send(payload);
+// MSG handler from WORKER
+const messageHandler = ({ msg, worker, node_type, nodeHash }) => {
+    // check error from worker
+    if (msg.error) return done(error);
+    console.log(`${c.red}<<<[MASTER node] channel: "${channel}". Send RPC callback data<<<\n${c.white}`, msg);
+    // Trigger done handler to fire back rpc result
+    // - first arg:  error status
+    // - second arg: result data
+    done(null, {
+        msg,
+        worker,
+        channel: node_rpc_channel,
+        node_type,
+        nodeHash
+    });
+};
 
 /** REDIS RPC + cluster RPC chatting behavior */
 const node_rpc_channel = channel.jrpc("master");
@@ -36,26 +52,10 @@ console.log(`[MASTER node]: Init RPC service "${node_rpc_channel}"`);
 const rpc = new redisRpc(redis_cfg);
 // RPC handler
 rpc.on(node_rpc_channel, ({ payload }, channel, done) => {
-    if (payload) console.log(`${c.yellow}[MASTER node] channel: "${channel}". RPC Data>>>\n${c.white}`, payload);
+    if (payload) console.log(`${c.yellow}>>>[MASTER node] channel: "${channel}". RPC Data>>>\n${c.white}`, payload);
     else return done("no payload");
     // send MSG to Random Worker
     sendMsgToRandWorker(payload);
-    // MSG handler from WORKER
-    const messageHandler = ({ msg, worker, node_type, nodeHash }) => {
-        // check error from worker
-        if (msg.error) return done(error);
-        console.log(`${c.yellow}[MASTER node] channel: "${channel}". Send RPC callback data<<<\n${c.white}`, payload);
-        // Trigger done handler to fire back rpc result
-        // - first arg:  error status
-        // - second arg: result data
-        done(null, {
-            msg,
-            worker,
-            channel: node_rpc_channel,
-            node_type,
-            nodeHash
-        });
-    };
     // handle message from worker
     for (const id in cluster.workers) cluster.workers[id].once("message", messageHandler);
 });
