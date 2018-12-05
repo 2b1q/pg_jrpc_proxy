@@ -11,7 +11,7 @@ worker.on("message", msg => {
     nodeRequest(node_type, method, params, config).then(node_response =>
         worker.send({
             msg: { ...node_response }, // node JSON-RPC response
-            worker: wid,
+            wid,
             node_type: node_type,
             nodeHash // keep nodeHash
         })
