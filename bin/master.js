@@ -44,6 +44,7 @@ rpc.on(node_rpc_channel, ({ payload }, channel, done) => {
     const messageHandler = ({ msg, worker, node_type, nodeHash }) => {
         // check error from worker
         if (msg.error) return done(error);
+        console.log(`${c.yellow}[MASTER node] channel: "${channel}". Send RPC callback data<<<\n${c.white}`, payload);
         // Trigger done handler to fire back rpc result
         // - first arg:  error status
         // - second arg: result data
