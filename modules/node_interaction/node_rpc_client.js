@@ -32,6 +32,7 @@ let logit = (msg = "") =>
  * */
 const nodeRequester = (node_type, method, params, config) =>
     new Promise(resolve => {
+        empty.error = null; // clear error
         let cmd = Object([{ method: method, params: params }]);
         console.log("exec cmd: ", cmd);
         let con = Object.create(null); // connection Object container
@@ -51,6 +52,8 @@ const nodeRequester = (node_type, method, params, config) =>
                 if (err) {
                     console.error(`Error on ${node_type} client request:\n`, err);
                     log_err(logit(err));
+                    // setup error
+                    empty.error = err;
                     return resolve(empty);
                 }
                 console.log(`${c.green}[${c.magenta}${node_type}${c.green}] node data: ${c.white}`, data);
