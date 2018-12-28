@@ -10,6 +10,7 @@
     "dependencies": {
         "bitcoin": "^3.0.1",
         "cluster": "^0.7.7",
+        "ethers": "^4.0.20",
         "json-parse-safe": "^1.0.5",
         "moment": "^2.22.2",
         "node-redis-rpc": "^1.0.8",
