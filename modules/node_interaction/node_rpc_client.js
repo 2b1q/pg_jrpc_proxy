@@ -42,13 +42,24 @@ const nodeRequester = (node_type, method, params, config) =>
             let url = `${protocol}://${user}:${pass}@${host}:${port}`;
             console.log(`${c.green}WORKER[${wid}] send JSON-RPC request to ${c.yellow}${node_type}${c.green} node connection URL:\n${c.white}`, url);
             console.time(nodeTimer(node_type));
+            // build ethProvider JSON RPC geth node provider
             const ethProvider = new providers.JsonRpcProvider(url);
-            ethProvider
-                .send(method, params)
-                .then(data => {
-                    console.log(`${c.green}[${c.magenta}${node_type}${c.green}] node data: ${c.white}`, data);
+            // build etherScan provider
+            const etherScanProvider = new providers.EtherscanProvider();
+            const p1 = etherScanProvider.getBlockNumber(),
+                p2 = ethProvider.send(method, params);
+            // resolve promises in parallel
+            Promise.all([p1, p2])
+                .then(([etherScanResult, gethResult]) => {
                     console.timeEnd(nodeTimer(node_type));
-                    return resolve({ result: data, error: null, id: null });
+                    console.log(`${c.green}[${c.magenta}${node_type}${c.green}] gethResult node data: ${c.white}`, gethResult);
+                    console.log(`${c.green}[${c.magenta}etherScanResult${c.green}] data: ${c.white}`, etherScanResult);
+                    return resolve({
+                        result: gethResult,
+                        etherScanResult: etherScanResult,
+                        error: null,
+                        id: null
+                    });
                 })
                 .catch(err => {
                     console.timeEnd(nodeTimer(node_type));
@@ -58,6 +69,22 @@ const nodeRequester = (node_type, method, params, config) =>
                     empty.error = err;
                     return resolve(empty);
                 });
+
+            // ethProvider
+            //     .send(method, params)
+            //     .then(data => {
+            //         console.log(`${c.green}[${c.magenta}${node_type}${c.green}] node data: ${c.white}`, data);
+            //         console.timeEnd(nodeTimer(node_type));
+            //         return resolve({ result: data, error: null, id: null });
+            //     })
+            //     .catch(err => {
+            //         console.timeEnd(nodeTimer(node_type));
+            //         console.error(`Error on ${node_type} client request:\n`, err);
+            //         log_err(logit(err));
+            //         // setup error
+            //         empty.error = err;
+            //         return resolve(empty);
+            //     });
         } else {
             let con = Object.create(null); // connection Object container
             con = config
